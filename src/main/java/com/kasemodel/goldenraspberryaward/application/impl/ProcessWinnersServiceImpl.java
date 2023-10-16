@@ -2,7 +2,9 @@ package com.kasemodel.goldenraspberryaward.application.impl;
 
 import com.kasemodel.goldenraspberryaward.application.ProcessWinnersService;
 import com.kasemodel.goldenraspberryaward.application.ProducerService;
+import com.kasemodel.goldenraspberryaward.infra.model.IntervalVO;
 import com.kasemodel.goldenraspberryaward.infra.model.ProducerWinnerDTO;
+import com.kasemodel.goldenraspberryaward.infra.model.ProducerWinnerWithYearVO;
 import jakarta.persistence.Tuple;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -25,28 +27,81 @@ public class ProcessWinnersServiceImpl implements ProcessWinnersService {
 	public ImmutablePair<List<ProducerWinnerDTO>, List<ProducerWinnerDTO>> processWinners() {
 		final var optionalWinners = producerService.findWinners();
 		if (optionalWinners.isPresent()) {
-			return calculateWinners(optionalWinners);
+			return calculateWinners(optionalWinners.get());
 		}
 		return null;
 	}
 
-	private ImmutablePair<List<ProducerWinnerDTO>, List<ProducerWinnerDTO>> calculateWinners(Optional<List<Tuple>> optionalWinners) {
-		final var winners = optionalWinners.get();
-		final Map<String, ProducerWinnerDTO> winnersMap = new HashMap<>();
-		winners.stream().forEach(winner -> {
+	private ImmutablePair<List<ProducerWinnerDTO>, List<ProducerWinnerDTO>> calculateWinners(final List<Tuple> winners) {
+		final Map<String, ProducerWinnerWithYearVO> winnersMap = processWinnersMap(winners);
+		final Map<Integer, Set<ProducerWinnerDTO>> intervalsMap = new TreeMap<>();
+		final ImmutablePair<Integer, Integer> minMaxIntervals = processMinMaxFinalListsPair(winnersMap, intervalsMap);
+		return new ImmutablePair<>(
+			intervalsMap.get(minMaxIntervals.getLeft()).stream().toList(),
+			intervalsMap.get(minMaxIntervals.getRight()).stream().toList());
+
+//		return new ImmutablePair<>(Collections.EMPTY_LIST, Collections.EMPTY_LIST);
+	}
+
+	private static ImmutablePair<Integer, Integer> processMinMaxFinalListsPair(Map<String, ProducerWinnerWithYearVO> winnersMap, Map<Integer, Set<ProducerWinnerDTO>> intervalsMap) {
+		final MutablePair<Integer, Integer> minMaxIntervals = new MutablePair<>();
+		final var finalWinnersIterator = winnersMap.values().iterator();
+		while (finalWinnersIterator.hasNext()) {
+			final var winner = finalWinnersIterator.next();
+			final TreeSet<IntervalVO> intervals = winner.calculateIntervals();
+			intervals.stream().forEach(interval -> {
+				final Integer key = interval.getInterval();
+				if (!intervalsMap.containsKey(key)) {
+					intervalsMap.put(key, new TreeSet<>());
+				}
+				intervalsMap.get(key).add(ProducerWinnerDTO.of(winner.getProducer(), key, interval.getPreviousYear(), interval.getFollowingYear()));
+				validateAndSetMinMaxIntervals(key, minMaxIntervals);
+			});
+		}
+		if (minMaxIntervals.getLeft().equals(minMaxIntervals.getRight()))
+			minMaxIntervals.setRight(null);
+		return ImmutablePair.of(minMaxIntervals);
+	}
+
+	private static void validateAndSetMinMaxIntervals(Integer key, MutablePair<Integer, Integer> minMaxIntervals) {
+		initilizeMinMaxIntervalsPair(minMaxIntervals, key);
+		if (key < minMaxIntervals.getLeft())
+			minMaxIntervals.setLeft(key);
+		else if (key > minMaxIntervals.getRight())
+			minMaxIntervals.setRight(key);
+	}
+
+	private static void initilizeMinMaxIntervalsPair(MutablePair<Integer, Integer> minMaxIntervals, Integer key) {
+		if (minMaxIntervals.getLeft() == null)
+			minMaxIntervals.setLeft(key);
+		if (minMaxIntervals.getRight() == null)
+			minMaxIntervals.setRight(key);
+	}
+
+	private static Map<String, ProducerWinnerWithYearVO> processWinnersMap(List<Tuple> winners) {
+		final Map<String, ProducerWinnerWithYearVO> winnersMap = new HashMap<>();
+		final var winnerIterator = winners.iterator();
+		while (winnerIterator.hasNext()) {
+			final var winner = winnerIterator.next();
 			final String name = winner.get(PRODUCER_NAME_INDEX, String.class);
-			final short year = winner.get(PRODUCER_YEAR_INDEX, Short.class);
-			if (!winnersMap.containsKey(name)) {
-				winnersMap.put(name, ProducerWinnerDTO.of(name, year));
-			} else {
-				final ProducerWinnerDTO innerDTO = winnersMap.get(name);
-				if (year < innerDTO.getPreviousWin())
-					innerDTO.updatePreviousWin(Integer.valueOf(year));
-				else if (year > innerDTO.getFollowingWin())
-					innerDTO.updateFollowingWin(Integer.valueOf(year));
-			}
-		});
-		return arrangeResult(winnersMap);
+			final Integer year = Integer.valueOf(winner.get(PRODUCER_YEAR_INDEX, Short.class));
+			if (!winnersMap.containsKey(name))
+				winnersMap.put(name, ProducerWinnerWithYearVO.of(name, Integer.valueOf(year)));
+			else
+				winnersMap.get(name).addYearAndCalculateGap(year);
+		}
+		return winnersMap;
+	}
+
+	private int sortInt(final Integer previous, final Integer next) {
+		return previous.equals(next) ? 0 :
+			previous < next ? -1 : 1;
+	}
+
+	private void validateAndAddGapsMap(final Map<Integer, List<ProducerWinnerWithYearVO>> gapsMap, final int gap, final ProducerWinnerWithYearVO winnerVO) {
+		if (!gapsMap.containsKey(gap))
+			gapsMap.put(gap, new ArrayList<>());
+		gapsMap.get(gap).add(winnerVO);
 	}
 
 	private ImmutablePair<List<ProducerWinnerDTO>, List<ProducerWinnerDTO>> arrangeResult(final Map<String, ProducerWinnerDTO> winnersMap) {
