@@ -13,6 +13,6 @@ public class BaseEntity<T> {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private T id;
-	@Column(name = "external_id", insertable = false, columnDefinition = "uuid default random_uuid()")
+	@Column(name = "external_id", updatable = false)
 	private UUID externalId;
 }

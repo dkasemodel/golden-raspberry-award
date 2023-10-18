@@ -1,4 +1,4 @@
-package com.kasemodel.goldenraspberryaward.infra.model;
+package com.kasemodel.goldenraspberryaward.infra.model.csvconverter;
 
 import com.opencsv.bean.AbstractBeanField;
 import com.opencsv.exceptions.CsvConstraintViolationException;
@@ -14,10 +14,11 @@ import java.util.stream.Stream;
 public class ConvertStringAsList extends AbstractBeanField {
 	@Override
 	protected Object convert(final String value) throws CsvDataTypeMismatchException, CsvConstraintViolationException {
-		log.info(value);
 		final String[] values = value.split(",+| and +");
 		final var result = Stream.of(values).filter(StringUtils::isNotBlank).collect(Collectors.toList());
-		result.stream().forEach(log::info);
+		if (log.isDebugEnabled()) {
+			log.debug("'{}' Converted into {} items", value, result.size());
+		}
 		return result;
 	}
 }

@@ -1,11 +1,9 @@
 package com.kasemodel.goldenraspberryaward.infra.persistence.repository;
 
-import com.kasemodel.goldenraspberryaward.infra.model.ProducerWinnerDTO;
-import com.kasemodel.goldenraspberryaward.infra.model.ProducerWinnerWithYearVO;
 import com.kasemodel.goldenraspberryaward.infra.persistence.entity.Producer;
 import jakarta.persistence.Tuple;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,7 +11,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface ProducerRepository extends CrudRepository<Producer, Long> {
+public interface ProducerRepository extends ListCrudRepository<Producer, Long> {
     Optional<Producer> findByName(String name);
 
 	@Query(
@@ -37,4 +35,10 @@ public interface ProducerRepository extends CrudRepository<Producer, Long> {
 			+ "  where a.winner",
 		nativeQuery = true)
 	Optional<List<Tuple>> findWinners();
+
+    Optional<Producer> findByExternalId(UUID externalId);
+
+	boolean existsByName(String name);
+
+//	Optional<Producer> updateNameByExternalId(String name, UUID externalId);
 }

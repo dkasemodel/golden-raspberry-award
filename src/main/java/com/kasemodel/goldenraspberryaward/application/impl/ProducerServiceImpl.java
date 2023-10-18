@@ -2,15 +2,18 @@ package com.kasemodel.goldenraspberryaward.application.impl;
 
 import com.kasemodel.goldenraspberryaward.application.ProducerService;
 import com.kasemodel.goldenraspberryaward.infra.persistence.entity.Producer;
+import com.kasemodel.goldenraspberryaward.infra.persistence.exception.ProducerAlreadyExistsException;
+import com.kasemodel.goldenraspberryaward.infra.persistence.exception.ProducerNotFoundException;
 import com.kasemodel.goldenraspberryaward.infra.persistence.repository.ProducerRepository;
+import com.kasemodel.goldenraspberryaward.interfaces.rest.model.ProducerResponse;
 import jakarta.persistence.Tuple;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -21,13 +24,10 @@ public class ProducerServiceImpl implements ProducerService {
 
 	@Override
 	public Producer validateAndSave(final Producer producer) {
-		log.info("Producer: '{}'", producer.getName());
-//		return repo.findByName(producer.getName())
-//			.orElse(repo.save(producer));
-		final var optionalProducer = repo.findByName(producer.getName());
-		if (optionalProducer.isPresent())
-			return optionalProducer.get();
-		return repo.save(producer);
+		if (log.isDebugEnabled())
+			log.debug("Producer - Validating and saving : {}", producer.getName());
+		return repo.findByName(producer.getName())
+			.orElseGet(() -> repo.save(producer));
 	}
 
 	@Override
@@ -42,14 +42,41 @@ public class ProducerServiceImpl implements ProducerService {
 		return repo.findWinners();
 	}
 
-//	@Override
-//	public Optional<Producer> findByExternalId(UUID externalId) {
-////		return repo.findByExternalId(externalId);
-//		return null;
-//	}
-//
-//	@Override
-//	public Optional<Producer> findByName(String name) {
-//		return Optional.empty();
-//	}
+	@Override
+	public Optional<Producer> findByExternalId(final UUID externalId) {
+		return repo.findByExternalId(externalId);
+	}
+
+	@Override
+	public Producer validateAndCreate(final String name) throws ProducerAlreadyExistsException {
+		if (repo.existsByName(name))
+			throw new ProducerAlreadyExistsException(name);
+		return create(name);
+	}
+
+	@Override
+	public List<ProducerResponse> findAll() {
+		final var producers = repo.findAll();
+		if (CollectionUtils.isEmpty(producers))
+			return Collections.EMPTY_LIST;
+		return producers.stream()
+			.map(producer -> new ProducerResponse(producer.getExternalId(), producer.getName()))
+			.collect(Collectors.toList());
+	}
+
+	@Override
+	@Transactional
+	public void updateName(final UUID externalId, final String name) throws ProducerNotFoundException {
+		final var producer = repo.findByExternalId(externalId)
+			.orElseThrow(() -> new ProducerNotFoundException(externalId));
+		producer.setName(name);
+		repo.save(producer);
+
+//		repo.updateNameByExternalId(name, externalId);
+	}
+
+	@Transactional
+	private Producer create(final String name) {
+		return repo.save(Producer.of(name));
+	}
 }

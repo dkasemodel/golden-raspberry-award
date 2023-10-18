@@ -1,13 +1,10 @@
 package com.kasemodel.goldenraspberryaward.application.impl;
 
-import com.kasemodel.goldenraspberryaward.application.AwardService;
 import com.kasemodel.goldenraspberryaward.application.ImporterServie;
 import com.kasemodel.goldenraspberryaward.application.InitializeData;
 import com.kasemodel.goldenraspberryaward.infra.model.InitialDataVO;
-import com.opencsv.CSVParserBuilder;
-import com.opencsv.CSVReader;
-import com.opencsv.CSVReaderBuilder;
 import com.opencsv.bean.CsvToBeanBuilder;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -16,7 +13,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -27,7 +23,6 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class InitializeDataImpl implements InitializeData {
-//	private final AwardService awardService;
 	private final ImporterServie importerServie;
 
 	@Value("${award.initial-data.file}")
@@ -35,7 +30,6 @@ public class InitializeDataImpl implements InitializeData {
 
 	@EventListener(ApplicationReadyEvent.class)
 	@Override
-	@Transactional
 	public void execute() {
 		try {
 			validateFile(dataFile);
@@ -64,8 +58,8 @@ public class InitializeDataImpl implements InitializeData {
 		final List<InitialDataVO> data = getDataFromCsv();
 		if (CollectionUtils.isEmpty(data))
 			throw new IllegalArgumentException(String.format("no data found inside %s file", dataFile));
-		data.stream().forEach(this::save);
-		log.info("Initial data loaded from {}", dataFile);
+		data.stream().forEach(importerServie::importData);
+		log.info("Initial data loaded! CSV file: {}", dataFile);
 	}
 
 	private List<InitialDataVO> getDataFromCsv() throws FileNotFoundException {
@@ -75,27 +69,5 @@ public class InitializeDataImpl implements InitializeData {
 			.build()
 			.parse();
 		return data;
-	}
-
-	private void save(final InitialDataVO initialDataVO) {
-		if (log.isDebugEnabled()) {
-			log.debug("Saving new data!");
-			log.debug("\t{}", initialDataVO);
-		}
-//		final var award = Award.of(initialDataVO);
-//		log.info(award.toString());
-////		awardRepository.save(award);
-//		awardService.create(award);
-		importerServie.importData(initialDataVO);
-	}
-
-	private CSVReader createReader() throws FileNotFoundException {
-		final FileReader fileReader = new FileReader(dataFile);
-		return new CSVReaderBuilder(fileReader)
-			.withSkipLines(1)
-			.withCSVParser(new CSVParserBuilder()
-				.withSeparator(';')
-				.build())
-			.build();
 	}
 }

@@ -1,0 +1,3 @@
+award:
+  initial-data:
+    file: ./src/test/resources/test-data.csv

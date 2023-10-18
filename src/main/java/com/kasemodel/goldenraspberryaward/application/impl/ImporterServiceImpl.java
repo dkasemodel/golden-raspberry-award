@@ -9,6 +9,7 @@ import com.kasemodel.goldenraspberryaward.infra.persistence.entity.Studio;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,6 +28,9 @@ public class ImporterServiceImpl implements ImporterServie {
 	@Override
 	@Transactional
 	public void importData(final InitialDataVO dataVO) {
+		if (log.isDebugEnabled()) {
+			log.debug("Importing data! {}", dataVO.toString());
+		}
 		final var producers = importProducers(dataVO.getProducers());
 		final var studios = importStudios(dataVO.getStudios());
 		final var movie = importMovie(dataVO.getTitle(), producers, studios);
@@ -35,6 +39,10 @@ public class ImporterServiceImpl implements ImporterServie {
 	}
 
 	private Set<Producer> importProducers(final List<String> producers) {
+		if (log.isDebugEnabled()) {
+			log.debug("Importing producers! Total: {}", producers.size());
+			producers.forEach(log::debug);
+		}
 		return producers.stream()
 			.map(Producer::of)
 			.map(producerService::validateAndSave)
@@ -51,6 +59,7 @@ public class ImporterServiceImpl implements ImporterServie {
 	private Movie importMovie(final String title, final Set<Producer> producers, final Set<Studio> studios) {
 		final var optionalMovie = movieService.findByTitle(title);
 		if (optionalMovie.isPresent()) {
+			// TODO: throw a MovieAlreadyExistsException
 			return optionalMovie.get();
 		}
 		final var movie = Movie.of(title, producers, studios);

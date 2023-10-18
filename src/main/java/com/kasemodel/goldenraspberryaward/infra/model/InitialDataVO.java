@@ -1,6 +1,7 @@
 package com.kasemodel.goldenraspberryaward.infra.model;
 
-import com.opencsv.bean.CsvBindAndSplitByName;
+import com.kasemodel.goldenraspberryaward.infra.model.csvconverter.ConvertStringAsBoolean;
+import com.kasemodel.goldenraspberryaward.infra.model.csvconverter.ConvertStringAsList;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvCustomBindByName;
 import lombok.Data;
@@ -15,11 +16,10 @@ public class InitialDataVO {
 	private Short year;
 	@CsvBindByName(required = true)
 	private String title;
-	@CsvBindAndSplitByName(elementType = String.class, splitOn = ",+", writeDelimiter = ",")
+	@CsvCustomBindByName(required = true, converter = ConvertStringAsList.class)
 	private List<String> studios;
-//	@CsvBindAndSplitByName(elementType = String.class, splitOn = ",+|and")
 	@CsvCustomBindByName(required = true, converter = ConvertStringAsList.class)
 	private List<String> producers;
-	@CsvBindByName
+	@CsvCustomBindByName(converter = ConvertStringAsBoolean.class)
 	private Boolean winner;
 }

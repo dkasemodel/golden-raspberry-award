@@ -18,13 +18,10 @@ public class StudioServiceImpl implements StudioService {
 
 	@Override
 	public Studio validateAndSave(final Studio studio) {
-		log.info("Processing Studio: '{}'", studio.getName());
-//		return repo.findByName(studio.getName())
-//			.orElse(repo.save(studio));
-		final var opt = repo.findByName(studio.getName());
-		if (opt.isPresent())
-			return opt.get();
-		return repo.save(studio);
+		if (log.isDebugEnabled())
+			log.debug("Studio - Validating and saving : {}", studio.getName());
+		return repo.findByName(studio.getName())
+			.orElseGet(() -> repo.save(studio));
 	}
 
 	@Override
