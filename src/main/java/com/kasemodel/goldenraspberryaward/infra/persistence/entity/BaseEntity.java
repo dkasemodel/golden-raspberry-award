@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
@@ -15,4 +16,8 @@ public class BaseEntity<T> {
 	private T id;
 	@Column(name = "external_id", updatable = false)
 	private UUID externalId;
+	@Column(name = "created_at", updatable = false, insertable = false, columnDefinition = "timestamp default now()")
+	private LocalDateTime createdAt;
+	@Column(name = "deleted_at", insertable = false)
+	private LocalDateTime deletedAt;
 }

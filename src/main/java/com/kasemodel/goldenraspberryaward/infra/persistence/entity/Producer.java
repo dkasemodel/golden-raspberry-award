@@ -11,7 +11,9 @@ import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Table
+@Table(indexes = {
+	@Index(name = "producer_deleted_at_idx", columnList = "deleted_at")
+})
 @NoArgsConstructor
 @Getter
 @Setter

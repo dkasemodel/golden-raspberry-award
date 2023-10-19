@@ -8,8 +8,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.UUID;
+
 @Entity
-@Table
+@Table(indexes = {
+	@Index(name = "award_deleted_at_idx", columnList = "deleted_at")
+})
 @NoArgsConstructor
 @Getter
 @Setter
@@ -26,6 +30,7 @@ public class Award extends BaseEntity<Long> {
 		this.year = year;
 		this.movie = movie;
 		this.winner = Boolean.TRUE.equals(winner);
+		setExternalId(UUID.randomUUID());
 	}
 
 	public static Award of(final InitialDataVO dataVO, final Movie movie) {

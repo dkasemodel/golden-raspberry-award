@@ -44,7 +44,7 @@ public class ProducerServiceImpl implements ProducerService {
 
 	@Override
 	public Optional<Producer> findByExternalId(final UUID externalId) {
-		return repo.findByExternalId(externalId);
+		return repo.findByExternalIdAndDeletedAtIsNull(externalId);
 	}
 
 	@Override
@@ -56,7 +56,7 @@ public class ProducerServiceImpl implements ProducerService {
 
 	@Override
 	public List<ProducerResponse> findAll() {
-		final var producers = repo.findAll();
+		final var producers = repo.findAllByDeletedAtIsNull();
 		if (CollectionUtils.isEmpty(producers))
 			return Collections.EMPTY_LIST;
 		return producers.stream()
@@ -67,12 +67,16 @@ public class ProducerServiceImpl implements ProducerService {
 	@Override
 	@Transactional
 	public void updateName(final UUID externalId, final String name) throws ProducerNotFoundException {
-		final var producer = repo.findByExternalId(externalId)
+		final var producer = repo.findByExternalIdAndDeletedAtIsNull(externalId)
 			.orElseThrow(() -> new ProducerNotFoundException(externalId));
 		producer.setName(name);
 		repo.save(producer);
+	}
 
-//		repo.updateNameByExternalId(name, externalId);
+	@Override
+	@Transactional
+	public void delete(UUID externalId) {
+		repo.deleteByExternalId(externalId);
 	}
 
 	@Transactional

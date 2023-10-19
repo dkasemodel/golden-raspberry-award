@@ -8,10 +8,13 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Entity
-@Table
+@Table(indexes = {
+	@Index(name = "movie_deleted_at_idx", columnList = "deleted_at")
+})
 @NoArgsConstructor
 @Getter
 @Setter
@@ -38,6 +41,7 @@ public class Movie extends BaseEntity<Long> {
 		this.title = title;
 		this.producers = producers;
 		this.studios = studios;
+		setExternalId(UUID.randomUUID());
 	}
 
 //	public static Movie of(final InitialDataVO initialDataVO) {

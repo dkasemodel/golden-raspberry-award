@@ -27,4 +27,6 @@ public interface ProducerService {
 
 	void updateName(UUID externalId, String name)
 		throws ProducerNotFoundException;
+
+    void delete(UUID externalId);
 }

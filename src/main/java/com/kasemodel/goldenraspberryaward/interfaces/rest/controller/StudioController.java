@@ -1,10 +1,10 @@
 package com.kasemodel.goldenraspberryaward.interfaces.rest.controller;
 
-import com.kasemodel.goldenraspberryaward.application.ProducerService;
-import com.kasemodel.goldenraspberryaward.infra.persistence.entity.Producer;
-import com.kasemodel.goldenraspberryaward.infra.persistence.exception.ProducerNotFoundException;
+import com.kasemodel.goldenraspberryaward.application.StudioService;
+import com.kasemodel.goldenraspberryaward.infra.persistence.entity.Studio;
+import com.kasemodel.goldenraspberryaward.infra.persistence.exception.StudioNotFoundException;
 import com.kasemodel.goldenraspberryaward.interfaces.rest.model.CreateByNameRequest;
-import com.kasemodel.goldenraspberryaward.interfaces.rest.model.ProducerResponse;
+import com.kasemodel.goldenraspberryaward.interfaces.rest.model.StudioResponse;
 import com.kasemodel.goldenraspberryaward.interfaces.rest.model.UpdateNameRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,47 +22,47 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping(
-	value = "/v1/producers",
+	value = "/v1/studios",
 	consumes = MediaType.APPLICATION_JSON_VALUE,
 	produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 @Slf4j
-public class ProducerController {
-	private final ProducerService producerService;
+public class StudioController {
+	private final StudioService studioService;
 
 	@PostMapping
-	public ResponseEntity create(@RequestBody final CreateByNameRequest producer) {
-		if (producer == null || StringUtils.isBlank(producer.name()))
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("producer name is required");
-		final Producer created = producerService.validateAndCreate(producer.name());
+	public ResponseEntity create(@RequestBody final CreateByNameRequest studio) {
+		if (studio == null || StringUtils.isBlank(studio.name()))
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("studio name is required");
+		final Studio created = studioService.validateAndCreate(studio.name());
 		return ResponseEntity.created(URI.create(String.format("/v1/producers/%s", created.getExternalId()))).build();
 	}
 
 	@GetMapping("/{externalId}")
-	public ResponseEntity<ProducerResponse> findByExternalId(@PathVariable final UUID externalId) {
-		final Optional<Producer> optProducer = producerService.findByExternalId(externalId);
-		if (optProducer.isPresent()) {
-			final Producer producer = optProducer.get();
-			return ResponseEntity.ok(new ProducerResponse(producer.getExternalId(), producer.getName()));
+	public ResponseEntity<StudioResponse> findByExternalId(@PathVariable final UUID externalId) {
+		final Optional<Studio> optStudio = studioService.findByExternalId(externalId);
+		if (optStudio.isPresent()) {
+			final Studio studio = optStudio.get();
+			return ResponseEntity.ok(new StudioResponse(studio.getExternalId(), studio.getName()));
 		}
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 	}
 
 	@GetMapping
-	public ResponseEntity<List<ProducerResponse>> findAll() {
-		final var producers = producerService.findAll();
-		if (CollectionUtils.isEmpty(producers)) {
+	public ResponseEntity<List<StudioResponse>> findAll() {
+		final var studios = studioService.findAll();
+		if (CollectionUtils.isEmpty(studios)) {
 			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 		}
-		return ResponseEntity.ok(producers);
+		return ResponseEntity.ok(studios);
 	}
 
 	@PutMapping("/{externalId}")
 	public ResponseEntity update(@PathVariable final UUID externalId, @RequestBody final UpdateNameRequest updateRequest) {
 		try {
-			producerService.updateName(externalId, updateRequest.name());
-		} catch (ProducerNotFoundException e) {
-			log.error("Error when try to update Producer", e);
+			studioService.updateName(externalId, updateRequest.name());
+		} catch (StudioNotFoundException e) {
+			log.error("Error when try to update Studio", e);
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -71,7 +71,7 @@ public class ProducerController {
 	@DeleteMapping("/{externalId}")
 	public ResponseEntity delete(@PathVariable final UUID externalId) {
 		try {
-			producerService.delete(externalId);
+			studioService.delete(externalId);
 		} catch (final Exception e) {
 			log.error("Error when deleting producer", e);
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());

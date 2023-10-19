@@ -2,7 +2,4 @@ package com.kasemodel.goldenraspberryaward.interfaces.rest.model;
 
 import lombok.Data;
 
-@Data
-public class CreateProducerRequest {
-	private String name;
-}
+public record CreateByNameRequest(String name) {}
