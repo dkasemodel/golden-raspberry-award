@@ -4,7 +4,6 @@ import com.kasemodel.goldenraspberryaward.application.ImporterServie;
 import com.kasemodel.goldenraspberryaward.application.InitializeData;
 import com.kasemodel.goldenraspberryaward.infra.model.InitialDataVO;
 import com.opencsv.bean.CsvToBeanBuilder;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;

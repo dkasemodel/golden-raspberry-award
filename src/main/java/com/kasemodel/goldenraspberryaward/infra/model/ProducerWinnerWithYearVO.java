@@ -2,7 +2,6 @@ package com.kasemodel.goldenraspberryaward.infra.model;
 
 import lombok.AccessLevel;
 import lombok.Getter;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Objects;
 import java.util.TreeSet;

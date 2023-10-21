@@ -1,6 +1,5 @@
 package com.kasemodel.goldenraspberryaward.infra.persistence.entity;
 
-import com.kasemodel.goldenraspberryaward.infra.model.InitialDataVO;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,11 +8,12 @@ import lombok.ToString;
 
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(indexes = {
-	@Index(name = "movie_deleted_at_idx", columnList = "deleted_at")
+	@Index(name = "movie_deleted_at_idx", columnList = "deleted_at"),
+	@Index(name = "movie_title_idx", columnList = "title"),
+	@Index(name = "movie_external_id_idx", columnList = "external_id")
 })
 @NoArgsConstructor
 @Getter

@@ -16,7 +16,7 @@ import java.util.UUID;
 public interface StudioRepository extends CrudRepository<Studio, Long> {
 	Optional<Studio> findByName(String name);
 
-    boolean existsByName(String name);
+	boolean existsByName(String name);
 
 	Optional<Studio> findByExternalIdAndDeletedAtIsNull(UUID externalId);
 

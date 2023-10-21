@@ -1,7 +1,7 @@
 package com.kasemodel.goldenraspberryaward.interfaces.rest.controller;
 
 import com.google.gson.Gson;
-import com.kasemodel.goldenraspberryaward.interfaces.rest.model.AwardWinnersResponse;
+import com.kasemodel.goldenraspberryaward.interfaces.rest.model.award.AwardWinnersResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class AwardControllerTest {
 	private static final String ROOT_PATH = "/v1/award";
-	private static final String WINNERS_PATH = ROOT_PATH + "/winners";
+	private static final String WINNERS_PATH = ROOT_PATH + "/producers/winners";
 	private static final Gson gson = new Gson();
 	private static final String PRODUCER_MIN_WINNER = "Joel Silver";
 	private static final String PRODUCER_MAX_WINNER = "Matthew Vaughn";

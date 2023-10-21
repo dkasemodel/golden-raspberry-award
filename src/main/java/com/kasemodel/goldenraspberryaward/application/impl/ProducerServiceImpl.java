@@ -10,11 +10,12 @@ import jakarta.persistence.Tuple;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -28,13 +29,6 @@ public class ProducerServiceImpl implements ProducerService {
 			log.debug("Producer - Validating and saving : {}", producer.getName());
 		return repo.findByName(producer.getName())
 			.orElseGet(() -> repo.save(producer));
-	}
-
-	@Override
-	public Set<Producer> validateAndSaveAll(final Set<Producer> producers) {
-		return producers.stream()
-			.map(this::validateAndSave)
-			.collect(Collectors.toSet());
 	}
 
 	@Override
@@ -55,13 +49,9 @@ public class ProducerServiceImpl implements ProducerService {
 	}
 
 	@Override
-	public List<ProducerResponse> findAll() {
-		final var producers = repo.findAllByDeletedAtIsNull();
-		if (CollectionUtils.isEmpty(producers))
-			return Collections.EMPTY_LIST;
-		return producers.stream()
-			.map(producer -> new ProducerResponse(producer.getExternalId(), producer.getName()))
-			.collect(Collectors.toList());
+	public List<Producer> findAll() {
+		return repo.findAllByDeletedAtIsNull()
+			.orElseGet(Collections::emptyList);
 	}
 
 	@Override
@@ -77,6 +67,12 @@ public class ProducerServiceImpl implements ProducerService {
 	@Transactional
 	public void delete(UUID externalId) {
 		repo.deleteByExternalId(externalId);
+	}
+
+	@Override
+	public Producer getOrCreate(ProducerResponse producer) {
+		return repo.findByExternalIdAndDeletedAtIsNull(producer.externalId())
+			.orElseGet(() -> create(producer.name()));
 	}
 
 	@Transactional

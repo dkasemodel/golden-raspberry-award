@@ -15,7 +15,7 @@ import java.util.UUID;
 
 @Repository
 public interface ProducerRepository extends CrudRepository<Producer, Long> {
-    Optional<Producer> findByName(String name);
+	Optional<Producer> findByName(String name);
 
 	@Query(
 		value = "with"
@@ -40,7 +40,7 @@ public interface ProducerRepository extends CrudRepository<Producer, Long> {
 		nativeQuery = true)
 	Optional<List<Tuple>> findWinners();
 
-    Optional<Producer> findByExternalIdAndDeletedAtIsNull(UUID externalId);
+	Optional<Producer> findByExternalIdAndDeletedAtIsNull(UUID externalId);
 
 	boolean existsByName(String name);
 
@@ -50,7 +50,5 @@ public interface ProducerRepository extends CrudRepository<Producer, Long> {
 		nativeQuery = true)
 	void deleteByExternalId(@Param("externalId") UUID externalId);
 
-//	Optional<Producer> updateNameByExternalId(String name, UUID externalId);
-
-	List<Producer> findAllByDeletedAtIsNull();
+	Optional<List<Producer>> findAllByDeletedAtIsNull();
 }

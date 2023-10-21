@@ -6,12 +6,18 @@ import com.kasemodel.goldenraspberryaward.infra.persistence.exception.StudioNotF
 import com.kasemodel.goldenraspberryaward.interfaces.rest.model.CreateByNameRequest;
 import com.kasemodel.goldenraspberryaward.interfaces.rest.model.StudioResponse;
 import com.kasemodel.goldenraspberryaward.interfaces.rest.model.UpdateNameRequest;
+import com.kasemodel.goldenraspberryaward.interfaces.rest.model.mapper.StudioResponseBuilder;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,41 +26,45 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@RestController
-@RequestMapping(
-	value = "/v1/studios",
-	consumes = MediaType.APPLICATION_JSON_VALUE,
-	produces = MediaType.APPLICATION_JSON_VALUE)
+@RestController()
+@RequestMapping("/v1/studios")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "Studios", description = "Studios Controller")
 public class StudioController {
 	private final StudioService studioService;
 
 	@PostMapping
+	@ApiResponses({
+		@ApiResponse(responseCode = "201", content = {@Content(schema = @Schema())}),
+		@ApiResponse(responseCode = "400", content = {@Content(schema = @Schema())}),
+		@ApiResponse(responseCode = "500", content = {@Content(schema = @Schema())})})
 	public ResponseEntity create(@RequestBody final CreateByNameRequest studio) {
 		if (studio == null || StringUtils.isBlank(studio.name()))
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("studio name is required");
 		final Studio created = studioService.validateAndCreate(studio.name());
-		return ResponseEntity.created(URI.create(String.format("/v1/producers/%s", created.getExternalId()))).build();
+		return ResponseEntity.created(URI.create(String.format("/v1/studios/%s", created.getExternalId()))).build();
 	}
 
 	@GetMapping("/{externalId}")
 	public ResponseEntity<StudioResponse> findByExternalId(@PathVariable final UUID externalId) {
 		final Optional<Studio> optStudio = studioService.findByExternalId(externalId);
 		if (optStudio.isPresent()) {
-			final Studio studio = optStudio.get();
-			return ResponseEntity.ok(new StudioResponse(studio.getExternalId(), studio.getName()));
+			return ResponseEntity.ok(StudioResponseBuilder.build(optStudio.get()));
 		}
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 	}
 
+	@Operation(
+		summary = "Retrieve all Studios",
+		tags = {"studios", "get"})
 	@GetMapping
 	public ResponseEntity<List<StudioResponse>> findAll() {
 		final var studios = studioService.findAll();
 		if (CollectionUtils.isEmpty(studios)) {
 			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 		}
-		return ResponseEntity.ok(studios);
+		return ResponseEntity.ok(StudioResponseBuilder.build(studios));
 	}
 
 	@PutMapping("/{externalId}")

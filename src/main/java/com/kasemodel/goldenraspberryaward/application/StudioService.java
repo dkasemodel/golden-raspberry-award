@@ -13,14 +13,16 @@ public interface StudioService {
 
 //	Set<Studio> validateAndSaveAll(Set<Studio> studios);
 
-    Studio validateAndCreate(String name)
+	Studio validateAndCreate(String name)
 		throws StudioAlreadyExistsException;
 
 	Optional<Studio> findByExternalId(UUID externalId);
 
-	List<StudioResponse> findAll();
+	List<Studio> findAll();
 
 	void updateName(UUID externalId, String name);
 
 	void delete(UUID externalId);
+
+	Studio getOrCreate(StudioResponse studioResponse);
 }

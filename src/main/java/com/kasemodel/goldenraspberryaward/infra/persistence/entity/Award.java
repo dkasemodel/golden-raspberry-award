@@ -12,7 +12,8 @@ import java.util.UUID;
 
 @Entity
 @Table(indexes = {
-	@Index(name = "award_deleted_at_idx", columnList = "deleted_at")
+	@Index(name = "award_deleted_at_idx", columnList = "deleted_at"),
+	@Index(name = "award_external_id_idx", columnList = "external_id")
 })
 @NoArgsConstructor
 @Getter
@@ -37,7 +38,7 @@ public class Award extends BaseEntity<Long> {
 		return new Award(dataVO.getYear(), movie, dataVO.getWinner());
 	}
 
-//	public static Award of(final InitialDataVO initialDataVO) {
-//		return new Award(initialDataVO.getYear(), Movie.of(initialDataVO), initialDataVO.getWinner());
-//	}
+	public static Award of(final Short year, final Boolean winner, final Movie movie) {
+		return new Award(year, movie, winner);
+	}
 }

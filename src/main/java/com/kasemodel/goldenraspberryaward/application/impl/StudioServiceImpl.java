@@ -10,14 +10,11 @@ import com.kasemodel.goldenraspberryaward.interfaces.rest.model.StudioResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -46,13 +43,8 @@ public class StudioServiceImpl implements StudioService {
 	}
 
 	@Override
-	public List<StudioResponse> findAll() {
-		final var studios = repo.findAllByDeletedAtIsNull();
-		if (CollectionUtils.isEmpty(studios))
-			return Collections.EMPTY_LIST;
-		return studios.stream()
-			.map(producer -> new StudioResponse(producer.getExternalId(), producer.getName()))
-			.collect(Collectors.toList());
+	public List<Studio> findAll() {
+		return repo.findAllByDeletedAtIsNull();
 	}
 
 	@Override
@@ -66,6 +58,12 @@ public class StudioServiceImpl implements StudioService {
 	@Override
 	public void delete(UUID externalId) {
 		repo.deleteByExternalId(externalId);
+	}
+
+	@Override
+	public Studio getOrCreate(final StudioResponse studio) {
+		return repo.findByExternalIdAndDeletedAtIsNull(studio.externalId())
+			.orElseGet(() -> create(studio.name()));
 	}
 
 	@Transactional

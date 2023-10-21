@@ -6,12 +6,16 @@ import com.kasemodel.goldenraspberryaward.infra.persistence.exception.ProducerNo
 import com.kasemodel.goldenraspberryaward.interfaces.rest.model.CreateByNameRequest;
 import com.kasemodel.goldenraspberryaward.interfaces.rest.model.ProducerResponse;
 import com.kasemodel.goldenraspberryaward.interfaces.rest.model.UpdateNameRequest;
+import com.kasemodel.goldenraspberryaward.interfaces.rest.model.mapper.ProducerResponseBuilder;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,16 +25,17 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(
-	value = "/v1/producers",
-	consumes = MediaType.APPLICATION_JSON_VALUE,
-	produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping("/v1/producers")
 @RequiredArgsConstructor
 @Slf4j
 public class ProducerController {
 	private final ProducerService producerService;
 
 	@PostMapping
+	@ApiResponses({
+		@ApiResponse(responseCode = "201", content = {@Content(schema = @Schema())}),
+		@ApiResponse(responseCode = "400", content = {@Content(schema = @Schema())}),
+		@ApiResponse(responseCode = "500", content = {@Content(schema = @Schema())})})
 	public ResponseEntity create(@RequestBody final CreateByNameRequest producer) {
 		if (producer == null || StringUtils.isBlank(producer.name()))
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("producer name is required");
@@ -42,8 +47,7 @@ public class ProducerController {
 	public ResponseEntity<ProducerResponse> findByExternalId(@PathVariable final UUID externalId) {
 		final Optional<Producer> optProducer = producerService.findByExternalId(externalId);
 		if (optProducer.isPresent()) {
-			final Producer producer = optProducer.get();
-			return ResponseEntity.ok(new ProducerResponse(producer.getExternalId(), producer.getName()));
+			return ResponseEntity.ok(ProducerResponseBuilder.build(optProducer.get()));
 		}
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 	}
@@ -54,7 +58,7 @@ public class ProducerController {
 		if (CollectionUtils.isEmpty(producers)) {
 			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 		}
-		return ResponseEntity.ok(producers);
+		return ResponseEntity.ok(ProducerResponseBuilder.build(producers));
 	}
 
 	@PutMapping("/{externalId}")

@@ -8,13 +8,10 @@ import jakarta.persistence.Tuple;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 public interface ProducerService {
 	Producer validateAndSave(Producer producer);
-
-	Set<Producer> validateAndSaveAll(Set<Producer> producers);
 
 	Optional<List<Tuple>> findWinners();
 
@@ -23,10 +20,12 @@ public interface ProducerService {
 	Producer validateAndCreate(String name)
 		throws ProducerAlreadyExistsException;
 
-	List<ProducerResponse> findAll();
+	List<Producer> findAll();
 
 	void updateName(UUID externalId, String name)
 		throws ProducerNotFoundException;
 
-    void delete(UUID externalId);
+	void delete(UUID externalId);
+
+	Producer getOrCreate(ProducerResponse producerResponse);
 }
