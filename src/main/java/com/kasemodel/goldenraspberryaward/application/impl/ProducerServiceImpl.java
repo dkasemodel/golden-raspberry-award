@@ -32,7 +32,7 @@ public class ProducerServiceImpl implements ProducerService {
 	}
 
 	@Override
-	public Optional<List<Tuple>> findWinners() {
+	public List<Tuple> findWinners() {
 		return repo.findWinners();
 	}
 

@@ -13,7 +13,7 @@ import java.util.UUID;
 public interface ProducerService {
 	Producer validateAndSave(Producer producer);
 
-	Optional<List<Tuple>> findWinners();
+	List<Tuple> findWinners();
 
 	Optional<Producer> findByExternalId(UUID externalId);
 

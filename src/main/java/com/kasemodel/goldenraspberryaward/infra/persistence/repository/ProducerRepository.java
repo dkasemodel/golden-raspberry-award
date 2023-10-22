@@ -38,7 +38,7 @@ public interface ProducerRepository extends CrudRepository<Producer, Long> {
 			+ "  join award as a on (pm.movie_id = a.movie_id and a.deleted_at is null) "
 			+ "  where a.winner",
 		nativeQuery = true)
-	Optional<List<Tuple>> findWinners();
+	List<Tuple> findWinners();
 
 	Optional<Producer> findByExternalIdAndDeletedAtIsNull(UUID externalId);
 

@@ -33,7 +33,7 @@ class AwardControllerTest {
 	private MockMvc mockMvc;
 
 	@Test
-	void shouldBeReturnAListOfOneWinnerEach() throws Exception {
+	void shouldReturnAListOfOneWinnerEach() throws Exception {
 		final MvcResult result = mockMvc.perform(get(WINNERS_PATH)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())

@@ -38,9 +38,19 @@ Para que a aplicação inicie é necessário passar um arquivo (CSV) com dados i
 Por padrão, a aplicação irá utilizar o arquivo [initial-data.csv](initial-data.csv), caso seja necessário iniciar a aplicação com outra carga inicial de dados, deve-se rodar o comando `make start` passando o parâmetro `EXTRA_PARAMS=-Daward.initial-data.file` com o caminho (completo ou relativo) do aquivo no qual se deseja utilizar para carregar na aplicaçao.
 
 ```shell
-make start EXTRA_PARAMS="-Daward.initial-data.file=/home/user/award/list.csv""
+make start EXTRA_PARAMS="-Daward.initial-data.file=/home/user/award/list.csv"
 ```
 O Parâmetro `EXTRA_PARAMS` pode ser utilizado para qualquer outro parâmetro necessário para inicar a aplicação, como por exemplo especificação do `HEAD`.
 ```shell
 make start EXTRA_PARAMS="-Xms512mb -Xmx1024mb"
+```
+É possível também iniciar a aplicação sem dados, mas para isso é necessário informar um arquivo CSV contendo apenas o cabeçalho, e setar o valor da configuração `award.initial-data.ignore-empty-data` para `TRUE`.
+
+Exemplo (arquivo):
+```
+year;title;studios;producers;winner
+```
+Exemplo (configuração):
+```shell
+make start EXTRA_PARAMS="-Daward.initial-data.file=/home/user/award/empty.csv -Daward.initial-data.ignore-empty-data=true"
 ```

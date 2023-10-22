@@ -7,6 +7,7 @@ import com.kasemodel.goldenraspberryaward.infra.model.ProducerWinnerDTO;
 import com.kasemodel.goldenraspberryaward.infra.model.ProducerWinnerWithYearVO;
 import jakarta.persistence.Tuple;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -25,9 +26,9 @@ public class ProcessWinnersServiceImpl implements ProcessWinnersService {
 
 	@Override
 	public ImmutablePair<List<ProducerWinnerDTO>, List<ProducerWinnerDTO>> processWinners() {
-		final var optionalWinners = producerService.findWinners();
-		if (optionalWinners.isPresent()) {
-			return calculateWinners(optionalWinners.get());
+		final var winners = producerService.findWinners();
+		if (CollectionUtils.isNotEmpty(winners)) {
+			return calculateWinners(winners);
 		}
 		return null;
 	}

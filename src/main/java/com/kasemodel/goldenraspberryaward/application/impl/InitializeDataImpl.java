@@ -26,6 +26,8 @@ public class InitializeDataImpl implements InitializeData {
 
 	@Value("${award.initial-data.file}")
 	private String dataFile;
+	@Value("${award.initial-data.ignore-empty-data:false}")
+	private Boolean ignoreEmptyData;
 
 	@EventListener(ApplicationReadyEvent.class)
 	@Override
@@ -56,9 +58,14 @@ public class InitializeDataImpl implements InitializeData {
 	private void loadData() throws FileNotFoundException {
 		final List<InitialDataVO> data = getDataFromCsv();
 		if (CollectionUtils.isEmpty(data))
-			throw new IllegalArgumentException(String.format("no data found inside %s file", dataFile));
-		data.stream().forEach(importerServie::importData);
-		log.info("Initial data loaded! CSV file: {}", dataFile);
+			if (Boolean.TRUE.equals(ignoreEmptyData))
+				log.warn("Application is set to start without data: award.initial-data.ignore-empty-data : {}", Boolean.TRUE.equals(ignoreEmptyData));
+			else
+				throw new IllegalArgumentException(String.format("no data found inside %s file", dataFile));
+		else {
+			data.stream().forEach(importerServie::importData);
+			log.info("Initial data loaded! CSV file: {}", dataFile);
+		}
 	}
 
 	private List<InitialDataVO> getDataFromCsv() throws FileNotFoundException {
