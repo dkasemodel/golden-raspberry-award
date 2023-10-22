@@ -55,5 +55,5 @@ Exemplo (configuração):
 make start EXTRA_PARAMS="-Daward.initial-data.file=/home/user/award/empty.csv -Daward.initial-data.ignore-empty-data=true"
 ```
 
-# Rodando a aplicação
+# Testando a aplicação
 Após a aplicação ser iniciada, ela estará disponível na porta 8080. Para testar os endpoints, é possível utulizar o swagger, disponível no endereço [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html). A documentaçãp do OpenAPI estão disponíveis aqui: [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs).
