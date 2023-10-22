@@ -1,4 +1,4 @@
-package com.kasemodel.goldenraspberryaward.interfaces.rest.controller;
+package com.kasemodel.goldenraspberryaward.interfaces.rest.controller.award;
 
 import com.google.gson.Gson;
 import com.kasemodel.goldenraspberryaward.interfaces.rest.model.award.AwardWinnersResponse;
