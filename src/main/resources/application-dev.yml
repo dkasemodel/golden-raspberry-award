@@ -15,4 +15,4 @@ logging:
 
 award:
   initial-data:
-    file: data.csv
+    file: initial-data.csv
