@@ -3,23 +3,26 @@ package com.kasemodel.goldenraspberryaward.application.impl;
 import com.kasemodel.goldenraspberryaward.application.StudioService;
 import com.kasemodel.goldenraspberryaward.infra.persistence.entity.Studio;
 import com.kasemodel.goldenraspberryaward.infra.persistence.exception.ProducerAlreadyExistsException;
-import com.kasemodel.goldenraspberryaward.infra.persistence.exception.StudioAlreadyExistsException;
-import com.kasemodel.goldenraspberryaward.infra.persistence.exception.StudioNotFoundException;
+import com.kasemodel.goldenraspberryaward.infra.persistence.exception.studio.StudioAlreadyExistsException;
+import com.kasemodel.goldenraspberryaward.infra.persistence.exception.studio.StudioNotFoundException;
+import com.kasemodel.goldenraspberryaward.infra.persistence.exception.studio.StudioNameCannotBeEmptyException;
 import com.kasemodel.goldenraspberryaward.infra.persistence.repository.StudioRepository;
 import com.kasemodel.goldenraspberryaward.interfaces.rest.model.StudioResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
 @Slf4j
-public class StudioServiceImpl implements StudioService {
+public class StudioServiceImpl extends PageableServiceImpl implements StudioService {
 	private final StudioRepository repo;
 
 	@Override
@@ -32,19 +35,26 @@ public class StudioServiceImpl implements StudioService {
 
 	@Override
 	public Studio validateAndCreate(String name) throws StudioAlreadyExistsException {
+		validate(name);
 		if (repo.existsByName(name))
 			throw new ProducerAlreadyExistsException(name);
 		return create(name);
 	}
 
-	@Override
-	public Optional<Studio> findByExternalId(UUID externalId) {
-		return repo.findByExternalIdAndDeletedAtIsNull(externalId);
+	private void validate(String name) {
+		if (StringUtils.isBlank(name))
+			throw new StudioNameCannotBeEmptyException();
 	}
 
 	@Override
-	public List<Studio> findAll() {
-		return repo.findAllByDeletedAtIsNull();
+	public Studio findByExternalId(final UUID externalId) {
+		return repo.findByExternalIdAndDeletedAtIsNull(externalId)
+			.orElseThrow(() -> new StudioNotFoundException(externalId));
+	}
+
+	@Override
+	public Page<Studio> findAll(final PageRequest pageable) {
+		return repo.findAllByDeletedAtIsNull(pageable);
 	}
 
 	@Override

@@ -58,7 +58,6 @@ public class MovieServiceImpl implements MovieService {
 			log.debug("Validate and create new movie");
 		}
 		validate(movieRequest);
-		validateMovieExistenceByTitle(movieRequest.title());
 		final var producers = getOrCreateProducers(movieRequest.producers());
 		final var studios = getOrCreateStudios(movieRequest.studios());
 		if (log.isDebugEnabled()) {
@@ -133,6 +132,7 @@ public class MovieServiceImpl implements MovieService {
 		validateTitle(movieRequest);
 		validateProducers(movieRequest.producers());
 		validateStudios(movieRequest.studios());
+		validateMovieExistenceByTitle(movieRequest.title());
 	}
 
 	private static void validateTitle(final CreateMovieRequest movieRequest) {
