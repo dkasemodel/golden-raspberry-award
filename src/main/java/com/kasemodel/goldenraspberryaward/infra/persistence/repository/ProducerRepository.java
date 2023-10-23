@@ -3,6 +3,8 @@ package com.kasemodel.goldenraspberryaward.infra.persistence.repository;
 import com.kasemodel.goldenraspberryaward.infra.persistence.entity.Producer;
 import jakarta.persistence.Tuple;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -50,5 +52,7 @@ public interface ProducerRepository extends CrudRepository<Producer, Long> {
 		nativeQuery = true)
 	void deleteByExternalId(@Param("externalId") UUID externalId);
 
-	Optional<List<Producer>> findAllByDeletedAtIsNull();
+	Page<Producer> findAllByDeletedAtIsNull(PageRequest pageable);
+
+	boolean existsByExternalId(UUID externalId);
 }

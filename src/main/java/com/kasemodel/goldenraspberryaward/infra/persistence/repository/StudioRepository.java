@@ -28,4 +28,6 @@ public interface StudioRepository extends CrudRepository<Studio, Long> {
 	@Query(value = "update studio set deleted_at = now() where external_id = :externalId",
 		nativeQuery = true)
 	void deleteByExternalId(@Param("externalId") UUID externalId);
+
+	boolean existsByExternalId(UUID externalId);
 }

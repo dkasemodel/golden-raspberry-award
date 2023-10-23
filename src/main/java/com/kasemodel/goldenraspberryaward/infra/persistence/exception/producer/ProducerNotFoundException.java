@@ -1,4 +1,6 @@
-package com.kasemodel.goldenraspberryaward.infra.persistence.exception;
+package com.kasemodel.goldenraspberryaward.infra.persistence.exception.producer;
+
+import com.kasemodel.goldenraspberryaward.infra.persistence.exception.RecordNotFoundException;
 
 import java.util.UUID;
 

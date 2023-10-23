@@ -2,10 +2,10 @@ package com.kasemodel.goldenraspberryaward.application.impl;
 
 import com.kasemodel.goldenraspberryaward.application.StudioService;
 import com.kasemodel.goldenraspberryaward.infra.persistence.entity.Studio;
-import com.kasemodel.goldenraspberryaward.infra.persistence.exception.ProducerAlreadyExistsException;
+import com.kasemodel.goldenraspberryaward.infra.persistence.exception.producer.ProducerAlreadyExistsException;
 import com.kasemodel.goldenraspberryaward.infra.persistence.exception.studio.StudioAlreadyExistsException;
-import com.kasemodel.goldenraspberryaward.infra.persistence.exception.studio.StudioNotFoundException;
 import com.kasemodel.goldenraspberryaward.infra.persistence.exception.studio.StudioNameCannotBeEmptyException;
+import com.kasemodel.goldenraspberryaward.infra.persistence.exception.studio.StudioNotFoundException;
 import com.kasemodel.goldenraspberryaward.infra.persistence.repository.StudioRepository;
 import com.kasemodel.goldenraspberryaward.interfaces.rest.model.StudioResponse;
 import jakarta.transaction.Transactional;
@@ -16,7 +16,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -67,6 +66,8 @@ public class StudioServiceImpl extends PageableServiceImpl implements StudioServ
 
 	@Override
 	public void delete(UUID externalId) {
+		if (!repo.existsByExternalId(externalId))
+			throw new StudioNotFoundException(externalId);
 		repo.deleteByExternalId(externalId);
 	}
 

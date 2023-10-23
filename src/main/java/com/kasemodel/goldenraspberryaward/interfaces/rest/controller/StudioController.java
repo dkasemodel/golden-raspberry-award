@@ -94,6 +94,7 @@ public class StudioController {
 	@ApiResponses({
 		@ApiResponse(responseCode = "204", content = { @Content(schema = @Schema()) }),
 		@ApiResponse(responseCode = "400", content = { @Content(schema = @Schema()) }),
+		@ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
 		@ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) })
 	})
 	public ResponseEntity update(@PathVariable final UUID externalId, @RequestBody final UpdateNameRequest updateRequest) {
@@ -108,7 +109,7 @@ public class StudioController {
 	)
 	@ApiResponses({
 		@ApiResponse(responseCode = "204", content = { @Content(schema = @Schema()) }),
-		@ApiResponse(responseCode = "400", content = { @Content(examples = {@ExampleObject(summary = "Studio not found", value = "Studio not found with ExternalId XYZ")}, schema = @Schema()) }),
+		@ApiResponse(responseCode = "404", content = { @Content(examples = {@ExampleObject(summary = "Studio not found", value = "Studio not found with ExternalId XYZ")}, schema = @Schema()) }),
 		@ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) })
 	})
 	public ResponseEntity delete(@PathVariable final UUID externalId) {

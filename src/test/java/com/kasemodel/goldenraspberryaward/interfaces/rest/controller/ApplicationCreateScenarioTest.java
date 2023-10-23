@@ -128,10 +128,9 @@ class ApplicationCreateScenarioTest {
 
 		final var resultContentString = mvcResult.getResponse().getContentAsString();
 		assertThat(resultContentString, notNullValue());
-		final Type listType = new TypeToken<ArrayList<ProducerResponse>>(){}.getType();
-		final var resultContent = gson.fromJson(resultContentString, listType);
-		assertThat(CollectionUtils.size(resultContent), equalTo(PRODUCERS_TO_CREATE));
-		return (List<ProducerResponse>) resultContent;
+		final var resultContent = gson.fromJson(resultContentString, PageResponse.class);
+		assertThat(CollectionUtils.size(resultContent.content()), equalTo(PRODUCERS_TO_CREATE));
+		return (List<ProducerResponse>) resultContent.content();
 	}
 
 	private void createMovies(List<StudioResponse> studioList, List<ProducerResponse> producerList) throws Exception {

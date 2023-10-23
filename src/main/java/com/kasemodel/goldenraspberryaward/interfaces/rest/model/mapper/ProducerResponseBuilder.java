@@ -15,7 +15,7 @@ public final class ProducerResponseBuilder {
 		return new ProducerResponse(producer.getExternalId(), producer.getName());
 	}
 
-	public static List<ProducerResponse> build(List<Producer> producers) {
+	public static List<ProducerResponse> build(final List<Producer> producers) {
 		return producers.stream().map(ProducerResponseBuilder::build)
 			.collect(Collectors.toList());
 	}
