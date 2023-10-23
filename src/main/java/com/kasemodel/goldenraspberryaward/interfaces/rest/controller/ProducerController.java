@@ -24,7 +24,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -61,11 +60,8 @@ public class ProducerController {
 		@ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) })
 	})
 	public ResponseEntity<ProducerResponse> findByExternalId(@PathVariable final UUID externalId) {
-		final Optional<Producer> optProducer = producerService.findByExternalId(externalId);
-		if (optProducer.isPresent()) {
-			return ResponseEntity.ok(ProducerResponseBuilder.build(optProducer.get()));
-		}
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		final var producer = producerService.findByExternalId(externalId);
+		return ResponseEntity.ok(ProducerResponseBuilder.build(producer));
 	}
 
 	@GetMapping

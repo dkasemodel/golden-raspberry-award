@@ -15,6 +15,7 @@ import com.kasemodel.goldenraspberryaward.infra.persistence.repository.MovieRepo
 import com.kasemodel.goldenraspberryaward.interfaces.rest.model.CreateMovieRequest;
 import com.kasemodel.goldenraspberryaward.interfaces.rest.model.ProducerResponse;
 import com.kasemodel.goldenraspberryaward.interfaces.rest.model.StudioResponse;
+import com.kasemodel.goldenraspberryaward.interfaces.rest.model.UpdateNameRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -32,7 +33,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 @Slf4j
-public class MovieServiceImpl implements MovieService {
+public class MovieServiceImpl extends PageableServiceImpl implements MovieService {
 	private final MovieRepository repo;
 	private final ProducerService producerService;
 	private final StudioService studioService;
@@ -72,8 +73,9 @@ public class MovieServiceImpl implements MovieService {
 	}
 
 	@Override
-	public Optional<Movie> findByExternalId(final UUID externalId) {
-		return repo.findFetchByExternalIdAndDeletedAtIsNull(externalId);
+	public Movie findByExternalId(final UUID externalId) {
+		return repo.findFetchByExternalIdAndDeletedAtIsNull(externalId)
+			.orElseThrow(() -> new MovieNotFoundException(externalId));
 	}
 
 	@Override
@@ -83,15 +85,23 @@ public class MovieServiceImpl implements MovieService {
 
 	@Override
 	public void delete(final UUID externalId) {
+		validateMovieExistenceByExternalId(externalId);
 		repo.deleteByExternalId(externalId);
 	}
 
 	@Override
-	public void updateTitle(UUID externalId, String title) {
+	public void updateTitle(final UUID externalId, final UpdateNameRequest updateNameRequest) {
+		validate(externalId, updateNameRequest);
 		final var movie = repo.findByExternalId(externalId)
 			.orElseThrow(() -> new MovieNotFoundException(externalId));
-		movie.setTitle(title);
+		movie.setTitle(updateNameRequest.name());
 		repo.save(movie);
+	}
+
+	private void validate(final UUID externalId, final UpdateNameRequest updateNameRequest) {
+		if (updateNameRequest == null || StringUtils.isBlank(updateNameRequest.name()))
+			throw new MovieWithoutTitleException();
+		validateMovieExistenceByTitle(updateNameRequest.name());
 	}
 
 	@Override

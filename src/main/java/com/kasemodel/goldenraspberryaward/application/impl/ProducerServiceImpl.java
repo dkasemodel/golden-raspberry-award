@@ -18,7 +18,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -41,8 +40,9 @@ public class ProducerServiceImpl extends PageableServiceImpl implements Producer
 	}
 
 	@Override
-	public Optional<Producer> findByExternalId(final UUID externalId) {
-		return repo.findByExternalIdAndDeletedAtIsNull(externalId);
+	public Producer findByExternalId(final UUID externalId) {
+		return repo.findByExternalIdAndDeletedAtIsNull(externalId)
+			.orElseThrow(() -> new ProducerNotFoundException(externalId));
 	}
 
 	@Override

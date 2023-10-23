@@ -41,7 +41,7 @@ public class AwardServiceImpl implements AwardService {
 	public Award create(final AwardCreateRequest awardCreateRequest) {
 		validate(awardCreateRequest);
 		final var movie = movieService.findByExternalId(awardCreateRequest.movie().externalId());
-		return repo.save(Award.of(awardCreateRequest.year(), awardCreateRequest.winner(), movie.get()));
+		return repo.save(Award.of(awardCreateRequest.year(), awardCreateRequest.winner(), movie));
 	}
 
 	@Override
@@ -59,8 +59,7 @@ public class AwardServiceImpl implements AwardService {
 		validate(updateRequest);
 		final var award = repo.findByExternalId(externalId)
 			.orElseThrow(() -> new AwardNotFoundException(externalId));
-		final var movie = movieService.findByExternalId(updateRequest.movie().externalId())
-			.orElseThrow(() -> new MovieNotFoundException(externalId));
+		final var movie = movieService.findByExternalId(updateRequest.movie().externalId());
 		award.setYear(updateRequest.year());
 		award.setWinner(Boolean.TRUE.equals(updateRequest.winner()));
 		award.setMovie(movie);

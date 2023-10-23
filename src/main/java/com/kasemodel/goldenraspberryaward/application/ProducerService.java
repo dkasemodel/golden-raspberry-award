@@ -10,7 +10,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface ProducerService extends PageableService {
@@ -18,7 +17,7 @@ public interface ProducerService extends PageableService {
 
 	List<Tuple> findWinners();
 
-	Optional<Producer> findByExternalId(UUID externalId);
+	Producer findByExternalId(UUID externalId);
 
 	Producer validateAndCreate(CreateByNameRequest producer)
 		throws ProducerAlreadyExistsException;

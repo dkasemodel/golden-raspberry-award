@@ -8,7 +8,10 @@ import com.kasemodel.goldenraspberryaward.interfaces.rest.model.mapper.MovieResp
 import com.kasemodel.goldenraspberryaward.interfaces.rest.model.mapper.ProducerResponseBuilder;
 import com.kasemodel.goldenraspberryaward.interfaces.rest.model.mapper.StudioResponseBuilder;
 import com.kasemodel.goldenraspberryaward.interfaces.rest.util.PageableValuesEnum;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -17,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +37,11 @@ public class MovieController {
 	private final MovieService movieService;
 
 	@PostMapping
+	@Operation(
+		summary = "Create new Movie",
+		description = "Create new Movie with the data sent by body. The method will return a status 201 (created) if everything is OK",
+		tags = {"Movies", "post"}
+	)
 	@ApiResponses({
 		@ApiResponse(responseCode = "201", content = {@Content(schema = @Schema())}),
 		@ApiResponse(responseCode = "400", content = {@Content(schema = @Schema())}),
@@ -43,44 +52,82 @@ public class MovieController {
 	}
 
 	@GetMapping("/{externalId}")
+	@Operation(
+		summary = "Retrieve a Movie by External ID",
+		description = "Retrieve a specific Movie, using the External ID on the path. It will returns a JSON with all data of the Movie (title, producers and studios).",
+		tags = {"Movies", "get"}
+	)
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = MovieResponse.class), mediaType = MediaType.APPLICATION_JSON_VALUE) }),
+		@ApiResponse(responseCode = "404", content = { @Content(schema = @Schema(), mediaType = MediaType.TEXT_PLAIN_VALUE) }),
+		@ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) })
+	})
 	public ResponseEntity<MovieResponse> findByExternalId(@PathVariable final UUID externalId) {
-		final Optional<Movie> optMovie = movieService.findByExternalId(externalId);
-		if (optMovie.isPresent()) {
-			final var movie = MovieResponseBuilder.buildWithhAllData(optMovie.get());
-			return ResponseEntity.ok(movie);
-		}
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		final var movie = movieService.findByExternalId(externalId);
+		return ResponseEntity.ok(MovieResponseBuilder.buildWithhAllData(movie));
 	}
 
 	@GetMapping
+	@Operation(
+		summary = "Retrieve all Movies",
+		tags = {"Movies", "get"}
+	)
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = PageResponse.class), mediaType = MediaType.APPLICATION_JSON_VALUE) }),
+		@ApiResponse(responseCode = "400", content = { @Content(schema = @Schema()) }),
+		@ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) })
+	})
 	public ResponseEntity findAll(
 		@RequestParam(value = "page", required = false, defaultValue = "1") final int page,
 		@RequestParam(value = "size", required = false, defaultValue = "10") final int size) {
-		if (size > PageableValuesEnum.MAX_PAGE_SIZE.getValue())
-			throw new MaxPageSizeException(size);
+		movieService.validatePageSize(size);
 		final var movie = movieService.findAll(PageRequest.of((page - 1), size, Sort.Direction.ASC, "title"))
 			.map(MovieResponseBuilder::buildWithhAllData);
 		return ResponseEntity.ok(new PageResponse(movie.getContent(), page, size, movie.getTotalPages(), movie.getTotalElements()));
 	}
 
 	@PutMapping("/{externalId}")
+	@Operation(
+		summary = "Update a Movie by External ID",
+		tags = { "Movies", "put" }
+	)
+	@ApiResponses({
+		@ApiResponse(responseCode = "204", content = { @Content(schema = @Schema()) }),
+		@ApiResponse(responseCode = "400", content = { @Content(schema = @Schema()) }),
+		@ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
+		@ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) })
+	})
 	public ResponseEntity update(@PathVariable final UUID externalId, @RequestBody final UpdateNameRequest updateRequest) {
-		movieService.updateTitle(externalId, updateRequest.name());
+		movieService.updateTitle(externalId, updateRequest);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
 	@DeleteMapping("/{externalId}")
+	@Operation(
+		summary = "Delete a Movie by External ID",
+		tags = { "Movies", "delete" }
+	)
+	@ApiResponses({
+		@ApiResponse(responseCode = "204", content = { @Content(schema = @Schema()) }),
+		@ApiResponse(responseCode = "404", content = { @Content(examples = {@ExampleObject(summary = "Movie not found", value = "Movie not found with ExternalId XYZ")}, schema = @Schema()) }),
+		@ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) })
+	})
 	public ResponseEntity delete(@PathVariable final UUID externalId) {
-		try {
-			movieService.delete(externalId);
-		} catch (final Exception e) {
-			log.error("Error when deleting producer", e);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-		}
+		movieService.delete(externalId);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
 	@GetMapping("/{externalId}/producers")
+	@Operation(
+		summary = "Retrieve all Producers of the Movie",
+		tags = { "Movies", "get" }
+	)
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", content = { @Content(array = @ArraySchema(schema = @Schema(implementation = ProducerResponse.class)), mediaType = MediaType.APPLICATION_JSON_VALUE) }),
+		@ApiResponse(responseCode = "204", content = { @Content(schema = @Schema()) }),
+		@ApiResponse(responseCode = "400", content = { @Content(schema = @Schema()) }),
+		@ApiResponse(responseCode = "500", content = { @Content(schema = @Schema) })
+	})
 	public ResponseEntity<List<ProducerResponse>> findAllProducers(@PathVariable final UUID externalId) {
 		final var movieProducers = movieService.findAllProducers(externalId);
 		if (movieProducers.isPresent())
@@ -89,6 +136,16 @@ public class MovieController {
 	}
 
 	@GetMapping("/{externalId}/studios")
+	@Operation(
+		summary = "Retrieve all Studios of the Movie",
+		tags = { "Movies", "get" }
+	)
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", content = { @Content(array = @ArraySchema(schema = @Schema(implementation = StudioResponse.class)), mediaType = MediaType.APPLICATION_JSON_VALUE) }),
+		@ApiResponse(responseCode = "204", content = { @Content(schema = @Schema()) }),
+		@ApiResponse(responseCode = "400", content = { @Content(schema = @Schema()) }),
+		@ApiResponse(responseCode = "500", content = { @Content(schema = @Schema) })
+	})
 	public ResponseEntity<List<StudioResponse>> findAllStudios(@PathVariable final UUID externalId) {
 		final var movieStudios = movieService.findAllStudios(externalId);
 		if (movieStudios.isPresent())
