@@ -40,8 +40,6 @@ public class ProcessWinnersServiceImpl implements ProcessWinnersService {
 		return new ImmutablePair<>(
 			intervalsMap.get(minMaxIntervals.getLeft()).stream().toList(),
 			intervalsMap.get(minMaxIntervals.getRight()).stream().toList());
-
-//		return new ImmutablePair<>(Collections.EMPTY_LIST, Collections.EMPTY_LIST);
 	}
 
 	private static ImmutablePair<Integer, Integer> processMinMaxFinalListsPair(Map<String, ProducerWinnerWithYearVO> winnersMap, Map<Integer, Set<ProducerWinnerDTO>> intervalsMap) {
@@ -79,7 +77,7 @@ public class ProcessWinnersServiceImpl implements ProcessWinnersService {
 			minMaxIntervals.setRight(key);
 	}
 
-	private static Map<String, ProducerWinnerWithYearVO> processWinnersMap(List<Tuple> winners) {
+	private static Map<String, ProducerWinnerWithYearVO> processWinnersMap(final List<Tuple> winners) {
 		final Map<String, ProducerWinnerWithYearVO> winnersMap = new HashMap<>();
 		final var winnerIterator = winners.iterator();
 		while (winnerIterator.hasNext()) {

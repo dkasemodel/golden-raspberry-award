@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -32,6 +33,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/v1/movies")
 @RequiredArgsConstructor
+@Tag(name = "Movies", description = "Movies Controller")
 @Slf4j
 public class MovieController {
 	private final MovieService movieService;
@@ -39,9 +41,7 @@ public class MovieController {
 	@PostMapping
 	@Operation(
 		summary = "Create new Movie",
-		description = "Create new Movie with the data sent by body. The method will return a status 201 (created) if everything is OK",
-		tags = {"Movies", "post"}
-	)
+		description = "Create new Movie with the data sent by body. The method will return a status 201 (created) if everything is OK")
 	@ApiResponses({
 		@ApiResponse(responseCode = "201", content = {@Content(schema = @Schema())}),
 		@ApiResponse(responseCode = "400", content = {@Content(schema = @Schema())}),
@@ -54,9 +54,7 @@ public class MovieController {
 	@GetMapping("/{externalId}")
 	@Operation(
 		summary = "Retrieve a Movie by External ID",
-		description = "Retrieve a specific Movie, using the External ID on the path. It will returns a JSON with all data of the Movie (title, producers and studios).",
-		tags = {"Movies", "get"}
-	)
+		description = "Retrieve a specific Movie, using the External ID on the path. It will returns a JSON with all data of the Movie (title, producers and studios).")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = MovieResponse.class), mediaType = MediaType.APPLICATION_JSON_VALUE) }),
 		@ApiResponse(responseCode = "404", content = { @Content(schema = @Schema(), mediaType = MediaType.TEXT_PLAIN_VALUE) }),
@@ -68,10 +66,7 @@ public class MovieController {
 	}
 
 	@GetMapping
-	@Operation(
-		summary = "Retrieve all Movies",
-		tags = {"Movies", "get"}
-	)
+	@Operation(summary = "Retrieve all Movies")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = PageResponse.class), mediaType = MediaType.APPLICATION_JSON_VALUE) }),
 		@ApiResponse(responseCode = "400", content = { @Content(schema = @Schema()) }),
@@ -87,10 +82,7 @@ public class MovieController {
 	}
 
 	@PutMapping("/{externalId}")
-	@Operation(
-		summary = "Update a Movie by External ID",
-		tags = { "Movies", "put" }
-	)
+	@Operation(summary = "Update a Movie by External ID")
 	@ApiResponses({
 		@ApiResponse(responseCode = "204", content = { @Content(schema = @Schema()) }),
 		@ApiResponse(responseCode = "400", content = { @Content(schema = @Schema()) }),
@@ -103,10 +95,7 @@ public class MovieController {
 	}
 
 	@DeleteMapping("/{externalId}")
-	@Operation(
-		summary = "Delete a Movie by External ID",
-		tags = { "Movies", "delete" }
-	)
+	@Operation(summary = "Delete a Movie by External ID")
 	@ApiResponses({
 		@ApiResponse(responseCode = "204", content = { @Content(schema = @Schema()) }),
 		@ApiResponse(responseCode = "404", content = { @Content(examples = {@ExampleObject(summary = "Movie not found", value = "Movie not found with ExternalId XYZ")}, schema = @Schema()) }),
@@ -118,10 +107,7 @@ public class MovieController {
 	}
 
 	@GetMapping("/{externalId}/producers")
-	@Operation(
-		summary = "Retrieve all Producers of the Movie",
-		tags = { "Movies", "get" }
-	)
+	@Operation(summary = "Retrieve all Producers of the Movie")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", content = { @Content(array = @ArraySchema(schema = @Schema(implementation = ProducerResponse.class)), mediaType = MediaType.APPLICATION_JSON_VALUE) }),
 		@ApiResponse(responseCode = "204", content = { @Content(schema = @Schema()) }),
@@ -136,10 +122,7 @@ public class MovieController {
 	}
 
 	@GetMapping("/{externalId}/studios")
-	@Operation(
-		summary = "Retrieve all Studios of the Movie",
-		tags = { "Movies", "get" }
-	)
+	@Operation(summary = "Retrieve all Studios of the Movie")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", content = { @Content(array = @ArraySchema(schema = @Schema(implementation = StudioResponse.class)), mediaType = MediaType.APPLICATION_JSON_VALUE) }),
 		@ApiResponse(responseCode = "204", content = { @Content(schema = @Schema()) }),

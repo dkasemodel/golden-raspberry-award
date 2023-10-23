@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -29,6 +30,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/v1/producers")
 @RequiredArgsConstructor
+@Tag(name = "Producers", description = "Producers Controller")
 @Slf4j
 public class ProducerController {
 	private final ProducerService producerService;
@@ -36,9 +38,7 @@ public class ProducerController {
 	@PostMapping
 	@Operation(
 		summary = "Create new Producer",
-		description = "Create new Producer with the name passed as parameter. The method will return a status 201 (created) if everything is OK",
-		tags = {"Producers", "post"}
-	)
+		description = "Create new Producer with the name passed as parameter. The method will return a status 201 (created) if everything is OK")
 	@ApiResponses({
 		@ApiResponse(responseCode = "201", content = {@Content(schema = @Schema())}),
 		@ApiResponse(responseCode = "400", content = {@Content(schema = @Schema())}),
@@ -51,9 +51,7 @@ public class ProducerController {
 	@GetMapping("/{externalId}")
 	@Operation(
 		summary = "Retrieve a Producer by External ID",
-		description = "Retrieve a specific Producer, using the External ID on the path. It will returns a JSON with external_id and name.",
-		tags = {"Producers", "get"}
-	)
+		description = "Retrieve a specific Producer, using the External ID on the path. It will returns a JSON with external_id and name.")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = ProducerResponse.class), mediaType = MediaType.APPLICATION_JSON_VALUE) }),
 		@ApiResponse(responseCode = "404", content = { @Content(schema = @Schema(), mediaType = MediaType.TEXT_PLAIN_VALUE) }),
@@ -65,10 +63,7 @@ public class ProducerController {
 	}
 
 	@GetMapping
-	@Operation(
-		summary = "Retrieve all Producers",
-		tags = {"Producers", "get"}
-	)
+	@Operation(summary = "Retrieve all Producers")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = PageResponse.class), mediaType = MediaType.APPLICATION_JSON_VALUE) }),
 		@ApiResponse(responseCode = "400", content = { @Content(schema = @Schema()) }),
@@ -84,10 +79,7 @@ public class ProducerController {
 	}
 
 	@PutMapping("/{externalId}")
-	@Operation(
-		summary = "Update a Producer by External ID",
-		tags = { "Studios", "put" }
-	)
+	@Operation(summary = "Update a Producer by External ID")
 	@ApiResponses({
 		@ApiResponse(responseCode = "204", content = { @Content(schema = @Schema()) }),
 		@ApiResponse(responseCode = "400", content = { @Content(schema = @Schema()) }),
@@ -100,10 +92,7 @@ public class ProducerController {
 	}
 
 	@DeleteMapping("/{externalId}")
-	@Operation(
-		summary = "Delete a Producer by External ID",
-		tags = { "Producers", "delete" }
-	)
+	@Operation(summary = "Delete a Producer by External ID")
 	@ApiResponses({
 		@ApiResponse(responseCode = "204", content = { @Content(schema = @Schema()) }),
 		@ApiResponse(responseCode = "404", content = { @Content(examples = {@ExampleObject(summary = "Producer not found", value = "Producer not found with ExternalId XYZ")}, schema = @Schema()) }),

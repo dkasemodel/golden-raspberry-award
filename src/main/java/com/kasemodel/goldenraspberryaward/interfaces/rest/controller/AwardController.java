@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,18 +33,23 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/v1/award")
+@RequestMapping("/v1/awards")
 @RequiredArgsConstructor
+@Tag(name = "Awards", description = "Award Controller")
 @Slf4j
-@Tag(name = "Award", description = "Award Controller")
 public class AwardController {
 	private final ProcessWinnersService processWinnersService;
 	private final AwardService awardService;
 
+	@GetMapping("/producers/winners")
 	@Operation(
 		summary = "Retrieve the Producers winners with minimum and maximum interval",
 		description = "Get the lists of winners with minimum interval and maximum interval between the awards. The response contains two lists, min (with the minimum interval between two awards) and manx (with the maximum interval between two awards)")
-	@GetMapping("/producers/winners")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = AwardWinnersResponse.class), mediaType = MediaType.APPLICATION_JSON_VALUE) }),
+		@ApiResponse(responseCode = "204", content = { @Content(schema = @Schema()) }),
+		@ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) })
+	})
 	public ResponseEntity<AwardWinnersResponse> processWinners() {
 		final var result = processWinnersService.processWinners();
 		if (result == null) {
@@ -53,13 +59,16 @@ public class AwardController {
 	}
 
 	@PostMapping
+	@Operation(
+		summary = "Create new Award",
+		description = "Create new Award with the sent by body. The method will return a status 201 (created) if everything is OK")
 	@ApiResponses({
 		@ApiResponse(responseCode = "201", content = {@Content(schema = @Schema())}),
 		@ApiResponse(responseCode = "400", content = {@Content(schema = @Schema())}),
 		@ApiResponse(responseCode = "500", content = {@Content(schema = @Schema())})})
 	public ResponseEntity create(@RequestBody final AwardCreateRequest awardCreateRequest) {
 		final var award = awardService.create(awardCreateRequest);
-		return ResponseEntity.created(URI.create(String.format("/v1/award/%s", award.getExternalId()))).build();
+		return ResponseEntity.created(URI.create(String.format("/v1/awards/%s", award.getExternalId()))).build();
 	}
 
 	@GetMapping("/{externalId}")
@@ -78,8 +87,7 @@ public class AwardController {
 	}
 
 	@GetMapping
-	@Operation(
-		summary = "Retrieve all Awards paginated")
+	@Operation(summary = "Retrieve all Awards paginated")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", content = {@Content(schema = @Schema(implementation = PageResponse.class), mediaType = "application/json")}),
 		@ApiResponse(responseCode = "400", content = {@Content(schema = @Schema())}),
@@ -110,8 +118,7 @@ public class AwardController {
 	@DeleteMapping("/{externalId}")
 	@Operation(
 		summary = "Delete an Award by External ID",
-		description = "Soft delete. Set the current Date/Time value into the DeletedAt property"
-	)
+		description = "Soft delete. Set the current Date/Time value into the DeletedAt property")
 	@ApiResponses({
 		@ApiResponse(responseCode = "204", content = {@Content(schema = @Schema())}),
 		@ApiResponse(responseCode = "400", content = {@Content(schema = @Schema())}),

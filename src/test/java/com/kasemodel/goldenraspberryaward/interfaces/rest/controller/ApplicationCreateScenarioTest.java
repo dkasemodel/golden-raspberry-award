@@ -37,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 	"award.initial-data.ignore-empty-data=true"
 })
 class ApplicationCreateScenarioTest {
-	private static final String AWARD_ROOT_PATH = "/v1/award";
+	private static final String AWARD_ROOT_PATH = "/v1/awards";
 	private static final String AWARD_PRODUCERS_WINNERS_PATH = AWARD_ROOT_PATH + "/producers/winners";
 	private static final Gson gson = new Gson();
 	private static final String STUDIOS_ROOT_PATH = "/v1/studios";

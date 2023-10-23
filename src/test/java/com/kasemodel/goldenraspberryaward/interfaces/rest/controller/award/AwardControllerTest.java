@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 class AwardControllerTest {
-	private static final String ROOT_PATH = "/v1/award";
+	private static final String ROOT_PATH = "/v1/awards";
 	private static final String WINNERS_PATH = ROOT_PATH + "/producers/winners";
 	private static final Gson gson = new Gson();
 	private static final String PRODUCER_MIN_WINNER = "Joel Silver";

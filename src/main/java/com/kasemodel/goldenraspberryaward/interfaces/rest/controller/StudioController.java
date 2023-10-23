@@ -38,9 +38,7 @@ public class StudioController {
 	@PostMapping
 	@Operation(
 		summary = "Create new Studio",
-		description = "Create new Studio with the name passed as parameter. The method will return a status 201 (created) if everything is OK",
-		tags = {"Studios", "post"}
-	)
+		description = "Create new Studio with the name passed as parameter. The method will return a status 201 (created) if everything is OK")
 	@ApiResponses({
 		@ApiResponse(responseCode = "201", content = { @Content(schema = @Schema()) }),
 		@ApiResponse(responseCode = "400", content = { @Content(schema = @Schema()) }),
@@ -54,9 +52,7 @@ public class StudioController {
 	@GetMapping("/{externalId}")
 	@Operation(
 		summary = "Retrieve a Studio by External ID",
-		description = "Retrieve a specific Studio, using the External ID on the path. It will returns a JSON with external_id and name.",
-		tags = {"Studios", "get"}
-	)
+		description = "Retrieve a specific Studio, using the External ID on the path. It will returns a JSON with external_id and name.")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = StudioResponse.class), mediaType = MediaType.APPLICATION_JSON_VALUE) }),
 		@ApiResponse(responseCode = "404", content = { @Content(schema = @Schema(), mediaType = MediaType.TEXT_PLAIN_VALUE) }),
@@ -68,10 +64,7 @@ public class StudioController {
 	}
 
 	@GetMapping
-	@Operation(
-		summary = "Retrieve all Studios",
-		tags = {"Studios", "get"}
-	)
+	@Operation(summary = "Retrieve all Studios")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = PageResponse.class), mediaType = MediaType.APPLICATION_JSON_VALUE) }),
 		@ApiResponse(responseCode = "400", content = { @Content(schema = @Schema()) }),
@@ -87,10 +80,7 @@ public class StudioController {
 	}
 
 	@PutMapping("/{externalId}")
-	@Operation(
-		summary = "Update a Studio by External ID",
-		tags = { "Studios", "put" }
-	)
+	@Operation(summary = "Update a Studio by External ID")
 	@ApiResponses({
 		@ApiResponse(responseCode = "204", content = { @Content(schema = @Schema()) }),
 		@ApiResponse(responseCode = "400", content = { @Content(schema = @Schema()) }),
@@ -103,10 +93,7 @@ public class StudioController {
 	}
 
 	@DeleteMapping("/{externalId}")
-	@Operation(
-		summary = "Delete a Studio by External ID",
-		tags = { "Studios", "delete" }
-	)
+	@Operation(summary = "Delete a Studio by External ID")
 	@ApiResponses({
 		@ApiResponse(responseCode = "204", content = { @Content(schema = @Schema()) }),
 		@ApiResponse(responseCode = "404", content = { @Content(examples = {@ExampleObject(summary = "Studio not found", value = "Studio not found with ExternalId XYZ")}, schema = @Schema()) }),
