@@ -8,6 +8,7 @@ import com.kasemodel.goldenraspberryaward.infra.model.ProducerWinnerWithYearVO;
 import jakarta.persistence.Tuple;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.list.TreeList;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -47,7 +48,7 @@ public class ProcessWinnersServiceImpl implements ProcessWinnersService {
 		final var finalWinnersIterator = winnersMap.values().iterator();
 		while (finalWinnersIterator.hasNext()) {
 			final var winner = finalWinnersIterator.next();
-			final TreeSet<IntervalVO> intervals = winner.calculateIntervals();
+			final TreeList<IntervalVO> intervals = winner.calculateIntervals();
 			intervals.stream().forEach(interval -> {
 				final Integer key = interval.getInterval();
 				if (!intervalsMap.containsKey(key)) {
@@ -87,7 +88,7 @@ public class ProcessWinnersServiceImpl implements ProcessWinnersService {
 			if (!winnersMap.containsKey(name))
 				winnersMap.put(name, ProducerWinnerWithYearVO.of(name, Integer.valueOf(year)));
 			else
-				winnersMap.get(name).addYearAndCalculateGap(year);
+				winnersMap.get(name).addYear(year);
 		}
 		return winnersMap;
 	}

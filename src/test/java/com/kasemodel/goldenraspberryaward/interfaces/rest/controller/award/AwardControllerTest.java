@@ -27,7 +27,13 @@ class AwardControllerTest {
 	private static final String WINNERS_PATH = ROOT_PATH + "/producers/winners";
 	private static final Gson gson = new Gson();
 	private static final String PRODUCER_MIN_WINNER = "Joel Silver";
+	private static final Integer INTERVAL_MIN_WINNER = 1;
+	private static final Integer PREVIOUS_WIN_MIN_WINNER = 1990;
+	private static final Integer FOLLOWING_WIN_MIN_WINNER = 1991;
 	private static final String PRODUCER_MAX_WINNER = "Matthew Vaughn";
+	private static final Integer INTERVAL_MAX_WINNER = 13;
+	private static final Integer PREVIOUS_WIN_MAX_WINNER = 2002;
+	private static final Integer FOLLOWING_WIN_MAX_WINNER = 2015;
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -45,7 +51,13 @@ class AwardControllerTest {
 		assertThat(resultObject.max(), hasSize(1));
 		final var minWinner = resultObject.min().get(0);
 		assertThat(minWinner.getProducer(), equalTo(PRODUCER_MIN_WINNER));
+		assertThat(minWinner.getInterval(), equalTo(INTERVAL_MIN_WINNER));
+		assertThat(minWinner.getPreviousWin(), equalTo(PREVIOUS_WIN_MIN_WINNER));
+		assertThat(minWinner.getFollowingWin(), equalTo(FOLLOWING_WIN_MIN_WINNER));
 		final var maxWinner = resultObject.max().get(0);
 		assertThat(maxWinner.getProducer(), equalTo(PRODUCER_MAX_WINNER));
+		assertThat(maxWinner.getInterval(), equalTo(INTERVAL_MAX_WINNER));
+		assertThat(maxWinner.getPreviousWin(), equalTo(PREVIOUS_WIN_MAX_WINNER));
+		assertThat(maxWinner.getFollowingWin(), equalTo(FOLLOWING_WIN_MAX_WINNER));
 	}
 }

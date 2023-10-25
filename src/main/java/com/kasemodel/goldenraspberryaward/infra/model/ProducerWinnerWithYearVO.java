@@ -2,6 +2,7 @@ package com.kasemodel.goldenraspberryaward.infra.model;
 
 import lombok.AccessLevel;
 import lombok.Getter;
+import org.apache.commons.collections4.list.TreeList;
 
 import java.util.Objects;
 import java.util.TreeSet;
@@ -10,7 +11,7 @@ import java.util.TreeSet;
 public final class ProducerWinnerWithYearVO {
 	private final String producer;
 	private TreeSet<Integer> years;
-	private TreeSet<IntervalVO> yearsGaps;
+	private TreeList<IntervalVO> yearsGaps;
 	private Integer previousYear;
 	@Getter(AccessLevel.NONE)
 	private int hashCode;
@@ -19,7 +20,7 @@ public final class ProducerWinnerWithYearVO {
 		this.producer = producer;
 		this.years = new TreeSet<>();
 		this.years.add(year);
-		this.yearsGaps = new TreeSet<>();
+		this.yearsGaps = new TreeList<>();
 		this.previousYear = year;
 		calculateAndSetHashCode();
 	}
@@ -33,11 +34,11 @@ public final class ProducerWinnerWithYearVO {
 		return this.hashCode;
 	}
 
-	public void addYearAndCalculateGap(final Integer year) {
+	public void addYear(final Integer year) {
 		this.years.add(year);
 	}
 
-	public TreeSet<IntervalVO> calculateIntervals() {
+	public TreeList<IntervalVO> calculateIntervals() {
 		if (!this.yearsGaps.isEmpty())
 			this.yearsGaps.clear();
 		int previousYear = 0;
